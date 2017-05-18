@@ -1,0 +1,24 @@
+{
+  "name": "astrobot",
+  "version": "1.0.0",
+  "description": "AstroBot for Twitch.",
+  "main": "AstroBot_init.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cobya/AstroBot.git"
+  },
+  "author": "Coby Allred",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cobya/AstroBot/issues"
+  },
+  "homepage": "https://github.com/cobya/AstroBot#readme",
+  "dependencies": {
+    "async": "^2.4.0",
+    "pg": "^6.2.2",
+    "tmi.js": "^1.2.0"
+  }
+}

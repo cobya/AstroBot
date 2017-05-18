@@ -1,0 +1,6 @@
+# Sublime Project Files
+*.sublime-project
+*.sublime-workspace
+
+# My Notes
+DataBaseStructure.xlsx
