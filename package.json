@@ -17,8 +17,13 @@
   },
   "homepage": "https://github.com/cobya/AstroBot#readme",
   "dependencies": {
+    "add-zero": "^1.0.0",
     "async": "^2.4.0",
+    "cron": "^1.2.1",
+    "lodash": "^4.17.4",
+    "os": "^0.1.1",
     "pg": "^6.2.2",
-    "tmi.js": "^1.2.0"
-  }
+    "tmi.js": "^1.2.1"
+  },
+  "devDependencies": {}
 }
