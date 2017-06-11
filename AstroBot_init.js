@@ -9,6 +9,7 @@ const tmi = require("tmi.js");
 const pg = require('pg');
 const async = require("async");
 const botStartup = require("./code_modules/bot_core/bot_startup");
+var botCleanup = require("./code_modules/bot_core/bot_cleanup").Cleanup();
 
 // Creating a global EOL variable
 global.endOfLine = require('os').EOL;
@@ -39,5 +40,3 @@ async.waterfall([botStartup.connectBot, botStartup.startBotChat, botStartup.star
 		console.log("Initial setup has been completed.");
 	}
 });
-
-

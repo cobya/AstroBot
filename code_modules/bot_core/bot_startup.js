@@ -6,14 +6,28 @@
 
 // Including all of the necessary modules for the bot to run
 const CronJob = require("cron").CronJob;
-var async = require("async");
+const async = require("async");
 const addZero = require("add-zero");
 const channelConnect = require("../channels/channel_connect");
+const botUtils = require("./bot_utils");
+const dbPool = require("../database/pool");
+
+// Including the moderation code modules
+const globalBlacklist = require("../moderation/global_blacklist");
+const channelBlacklist = require("../moderation/channel_blacklist");
+const linkModeration = require("../moderation/manage_links");
+const copypastaModeration = require("../moderation/copypasta_spam");
+const emoteModeration = require("../moderation/emote_spam");
+const repeatedModeration = require("../moderation/repeated_words_spam");
+const capsModeration = require("../moderation/caps_spam");
+const symbolModeration = require("../moderation/symbol_spam");
+
+// Including the commands and alert modules
 const globalCommands = require("../commands/global_commands");
 const channelCommands = require("../commands/channel_commands");
 const subAlerts = require("../alerts/sub_alert");
 const bitAlerts = require("../alerts/bits_alert");
-const db_pool = require("../database/pool");
+
 
 function createTimeString() {
 	var time = new Date();
@@ -26,6 +40,7 @@ function connectToServer(connectToServerCallback) {
 	global.tmi_client.connect();
 	global.tmi_client.on('connected', function(address, port) {
 		console.log("Address: " + address + " Port: " + port + global.endOfLine);
+		connectToServerCallback(null, "connected");
 	});
 
 	global.tmi_client.on("ping", function () {
@@ -40,7 +55,6 @@ function connectToServer(connectToServerCallback) {
 		console.log(`[${timeString}] Sent a PONG to Twitch servers with a latency of ${latency}s`);
 	});
 
-	connectToServerCallback(null, "connected");
 };
 
 module.exports = {
@@ -74,14 +88,27 @@ module.exports = {
 				// In the case of any messages in chat, check them
 				case "action":
 				case "chat":
-					// pass to global blacklist
-					// pass to channel blacklist
-					// pass through channel moderation filters
-					// pass to global commands list
-					if(message.charAt(0) == "!"){
-						globalCommands.checkIfGlobalCommand(channel, userstate, message);
-						channelCommands.checkIfChannelCommand(channel, userstate, message);
-					}
+					async.waterfall([
+						async.apply(botUtils.getChannelID, channel, userstate, message),
+						botUtils.getUserID,
+						botUtils.getUserRoleID,
+						globalBlacklist.runGlobalBlacklist,
+						channelBlacklist.runChannelBlacklist,
+						linkModeration.manageLinks,
+						copypastaModeration.copypastaModeration,
+						emoteModeration.emoteModeration,
+						repeatedModeration.repeatedModeration,
+						capsModeration.capsModeration,
+						symbolModeration.symbolModeration,
+						globalCommands.checkGlobalCommand,
+						channelCommands.checkChannelCommand
+					], function (err) {
+						if(err) {
+							console.error('Error during message checking.', err);
+						} else {
+							console.log("Message checked.");
+						}
+					});
 					break;
 
 				// In the case of whispers, just send them a message saying you're a bot.
@@ -92,6 +119,27 @@ module.exports = {
 				// If the API breaks, try and filter it like chat
 				default:
 					// do the same as chat? shouldn't happen, but still
+					async.waterfall([
+						async.apply(botUtils.getChannelID, channel, userstate, message),
+						botUtils.getUserID,
+						botUtils.getUserRoleID,
+						globalBlacklist.runGlobalBlacklist,
+						channelBlacklist.runChannelBlacklist,
+						linkModeration.manageLinks,
+						copypastaModeration.copypastaModeration,
+						emoteModeration.emoteModeration,
+						repeatedModeration.repeatedModeration,
+						capsModeration.capsModeration,
+						symbolModeration.symbolModeration,
+						globalCommands.checkGlobalCommand,
+						channelCommands.checkChannelCommand
+					], function (err) {
+						if(err) {
+							console.error('Error during message checking.', err);
+						} else {
+							console.log("Message checked.");
+						}
+					});
 					break;
 			}
 		});
