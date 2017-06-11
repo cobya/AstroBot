@@ -12,8 +12,9 @@ function exitFunctionality() {
 			console.error(`We're all fucked now`, err);
 			return;
 		} else {
-			// Debug print
-			console.log(`All channels have had their connected value set to false`)
+			if (global.runDebugPrints == true) {
+				console.log(`All channels have had their connected value set to false`);
+			}
 			return;
 		}
 	});
@@ -33,13 +34,13 @@ exports.Cleanup = function Cleanup(callback) {
 
 	// catch ctrl+c event and exit normally
 	process.on('SIGINT', function () {
-		console.log('Ctrl-C...');
+		console.log('PROCESS EXIT: Ctrl-C Interrupt');
 		process.exit(2);
  	});
 
  	//catch uncaught exceptions, trace, then exit normally
 	process.on('uncaughtException', function(e) {
-		console.log('Uncaught Exception...');
+		console.log('PROCESS EXIT: Uncaught Exception');
 		console.log(e.stack);
 	process.exit(99);
 	});

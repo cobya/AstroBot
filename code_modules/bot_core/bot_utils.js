@@ -17,7 +17,9 @@ module.exports = {
 				return;
 			} else if (channelID.rows.length !== 0) {
 				// DEBUG PRINT
-				console.log(`Channel ID is ${channelID.rows[0].channel_id}`);
+				if (global.runDebugPrints == true) {
+					console.log(`Channel ID is ${channelID.rows[0].channel_id}`);
+				}
 
 				getChannelIDCallback(null, channel, userstate, message, channelID.rows[0].channel_id);
 				return;
@@ -42,13 +44,18 @@ module.exports = {
 					return;
 				} else if (userID.rows.length !== 0) {
 					// DEBUG PRINT
-					console.log(`User ID is ${userID.rows[0].user_id}`);
+					if (global.runDebugPrints == true) {
+						console.log(`User ID is ${userID.rows[0].user_id}`);
+					}
 
 					getUserIDCallback(null, channel, userstate, message, channelID, userID.rows[0].user_id);
 					return;
 				} else if (userID.rows.length === 0) {
 					// DEBUG PRINT
-					console.log(`User ID not found for ${user}.`);
+					if (global.runDebugPrints == true) {
+						console.log(`User ID not found for ${user}.`);
+					}
+					
 
 					// If user is special (Moderator) and does not have a userid, create but return -1 for userID, else return -1 for userID
 					if(userstate.mod == true) {
@@ -89,13 +96,18 @@ module.exports = {
 					return;
 				} else if (userRoleID.rows.length !== 0) { // If there is a role for the user, return that
 					// DEBUG PRINT
-					console.log(`User ID ${userID} has Role ID ${userRoleID.rows[0].role_id}`);
+					if (global.runDebugPrints == true) {
+						console.log(`User ID ${userID} has Role ID ${userRoleID.rows[0].role_id}`);
+					}
+					
 					
 					getUserRoleIDCallback(err, channel, userstate, message, channelID, userID, userRoleID.rows[0].role_id);
 					return;
 				} else if (userRoleID.rows.length === 0) { // If there is not a role for the user, determine one
 					// DEBUG PRINT
-					console.log(`User ID ${userID} does not have a role in Channel ID ${channelID}`);
+					if (global.runDebugPrints == true) {
+						console.log(`User ID ${userID} does not have a role in Channel ID ${channelID}`);
+					}
 					
 					if (userstate.mod == true) { // If mod, return a userrole of 5
 						getUserRoleIDCallback(null, channel, userstate, message, channelID, userID, 5);

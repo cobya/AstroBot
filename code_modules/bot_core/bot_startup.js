@@ -46,13 +46,18 @@ function connectToServer(connectToServerCallback) {
 	global.tmi_client.on("ping", function () {
     	var timeString = createTimeString();
 
-		console.log(`[${timeString}] Received PING from Twitch servers`);
+		if (global.runConnectionPrints == true) {
+			console.log(`[${timeString}] Received PING from Twitch servers`);
+		}
 	});
 
 	global.tmi_client.on("pong", function (latency) {
 		var timeString = createTimeString();
 
-		console.log(`[${timeString}] Sent a PONG to Twitch servers with a latency of ${latency}s`);
+		if (global.runConnectionPrints == true) {
+			console.log(`[${timeString}] Sent a PONG to Twitch servers with a latency of ${latency}s`);
+		}
+		
 	});
 
 };
@@ -70,7 +75,11 @@ module.exports = {
 				console.error('Error during initial connections of AstroBot.', error);
 			} else {
 				connectBotCallback(null, "connected");
-				console.log("Successful initial connections.");
+
+				if (global.runDebugPrints == true) {
+					console.log("Successful initial connections.");
+				}
+				
 			}
 		});
 	},
@@ -106,7 +115,9 @@ module.exports = {
 						if(err) {
 							console.error('Error during message checking.', err);
 						} else {
-							console.log("Message checked.");
+							if (global.runDebugPrints == true) {
+								console.log("Message checked.");
+							}
 						}
 					});
 					break;
@@ -137,7 +148,9 @@ module.exports = {
 						if(err) {
 							console.error('Error during message checking.', err);
 						} else {
-							console.log("Message checked.");
+							if (global.runDebugPrints == true) {
+								console.log("Message checked.");
+							}
 						}
 					});
 					break;
@@ -152,21 +165,30 @@ module.exports = {
 		global.tmi_client.on("subscription", function (channel, username, method, message, userstate) {
 			var timeString = createTimeString();
 
-			console.log(`[${timeString}] ${username} subscribed on ${channel} with the message "${message}"`);
+			if (global.runDebugPrints == true) {
+				console.log(`[${timeString}] ${username} subscribed on ${channel} with the message "${message}"`);
+			}
+			
 			subAlerts.subAlert(channel, username);
 		});
 
 		global.tmi_client.on("resub", function (channel, username, months, message, userstate, methods) {
 			var timeString = createTimeString();
 
-			console.log(`[${timeString}] ${username} resubbed for ${months} months on ${channel} with the message "${message}"`);
+			if (global.runDebugPrints == true) {
+				console.log(`[${timeString}] ${username} resubbed for ${months} months on ${channel} with the message "${message}"`);
+			}
+			
 			subAlerts.resubAlert(channel, username);
 		});
 
 		global.tmi_client.on("cheer", function (channel, userstate, message) {
 			var timeString = createTimeString();
 
-			console.log(`[${timeString}] ${userstate.username} cheered ${userstate.bits} on ${channel} with the message "${message}"`);
+			if (global.runDebugPrints == true) {
+				console.log(`[${timeString}] ${userstate.username} cheered ${userstate.bits} on ${channel} with the message "${message}"`);
+			}
+
 			bitAlerts.bitAlert(channel, userstate);
 		});
 

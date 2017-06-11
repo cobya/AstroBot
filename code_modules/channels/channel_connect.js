@@ -16,7 +16,9 @@ module.exports = {
 			}
 
 			// Debug print
-			console.log("There are " + channelList.rows.length + " channels detected.");
+			if (global.runDebugPrints == true) {
+				console.log("There are " + channelList.rows.length + " channels detected.");
+			}
 
 			readAllChannelsCallback(null, channelList);
 		});
@@ -31,8 +33,10 @@ module.exports = {
 			}
 
 			// Debug print
-			console.log("There are " + channelList.rows.length + " channels detected.");
-
+			if (global.runDebugPrints == true) {
+				console.log("There are " + channelList.rows.length + " channels detected.");
+			}
+			
 			readNewChannels(null, channelList);
 		});
 	},

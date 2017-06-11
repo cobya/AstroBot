@@ -33,12 +33,18 @@ module.exports = {
 					return;
 				} else if (commandInfo.rows.length === 0) {
 					// DEBUG PRINT
-					console.log('No matching global command.');
+					if (global.runDebugPrints == true) {
+						console.log('No matching global command.');
+					}
+					
 					checkGlobalCommandCallback(null, channel, userstate, message, channelID, userID, userRoleID, 0);
 					return;
 				} else {
 					// DEBUG PRINT
-					console.log(`Matching global command with ID ${commandInfo.rows[0].command_id}.`);
+					if (global.runDebugPrints == true) {
+						console.log(`Matching global command with ID ${commandInfo.rows[0].command_id}.`);
+					}
+					
 					commandUtils.runCommand(channel, userstate, message, commandInfo);
 					checkGlobalCommandCallback(null, channel, userstate, message, channelID, userID, userRoleID, 1);
 					return;

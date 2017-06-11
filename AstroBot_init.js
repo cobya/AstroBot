@@ -14,6 +14,10 @@ var botCleanup = require("./code_modules/bot_core/bot_cleanup").Cleanup();
 // Creating a global EOL variable
 global.endOfLine = require('os').EOL;
 
+// Define global debug values, if "true" then execute debug prints
+global.runDebugPrints = false;
+global.runConnectionPrints = true;
+
 // Setting the options for the bot's authentication.
 var twitch_options = {
 	options: {
@@ -37,6 +41,6 @@ async.waterfall([botStartup.connectBot, botStartup.startBotChat, botStartup.star
 	if(err) {
 		console.error('Error during initial setup of AstroBot.', err);
 	} else {
-		console.log("Initial setup has been completed.");
+		console.log("----- AstroBot has begun work -----");
 	}
 });
