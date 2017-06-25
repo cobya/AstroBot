@@ -6,10 +6,9 @@
 
 // Requiring all of the necessary modules for this bot to run.
 const tmi = require("tmi.js");
-const pg = require('pg');
 const async = require("async");
 const botStartup = require("./code_modules/bot_core/bot_startup");
-var botCleanup = require("./code_modules/bot_core/bot_cleanup").Cleanup();
+const botCleanup = require("./code_modules/bot_core/bot_cleanup").Cleanup();
 
 // Creating a global EOL variable
 global.endOfLine = require('os').EOL;
@@ -37,7 +36,12 @@ var twitch_options = {
 global.tmi_client = new tmi.client(twitch_options);
 
 // Running the commands which make the bot connect to the server and start doing things
-async.waterfall([botStartup.connectBot, botStartup.startBotChat, botStartup.startBotEvents, botStartup.startBotCRONJobs], function (err) {
+async.waterfall([
+	botStartup.connectBot, 
+	botStartup.startBotChat, 
+	botStartup.startBotEvents, 
+	botStartup.startBotCRONJobs
+], function (err) {
 	if(err) {
 		console.error('Error during initial setup of AstroBot.', err);
 	} else {

@@ -90,7 +90,7 @@ module.exports = {
 			}
 		} else { // Else, query the DB and gets the user's role in the channel
 			var user = userstate.username;
-			dbPool.query(`SELECT role_id FROM public."channel_roles" WHERE user_id = $1 and channel_id = ${channelID}`, [userID], function(err, userRoleID) {
+			dbPool.query(`SELECT role_id FROM public."channel_user_roles" WHERE user_id = $1 and channel_id = ${channelID}`, [userID], function(err, userRoleID) {
 				if(err){ // If error running query, return the error
 					getUserRoleIDCallback(err, channel, userstate, message, -1, -1, -1);
 					return;

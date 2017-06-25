@@ -28,7 +28,7 @@ const channelCommands = require("../commands/channel_commands");
 const subAlerts = require("../alerts/sub_alert");
 const bitAlerts = require("../alerts/bits_alert");
 
-
+// Creates a time string with the format HH:MM:SS
 function createTimeString() {
 	var time = new Date();
 	var timeString = addZero(time.getHours()) + ":" + addZero(time.getMinutes()) + ":" + addZero(time.getSeconds());
@@ -36,6 +36,7 @@ function createTimeString() {
 	return timeString;
 };
 
+// Connects to the Twitch IRC server and begins logging connection information
 function connectToServer(connectToServerCallback) {
 	global.tmi_client.connect();
 	global.tmi_client.on('connected', function(address, port) {
@@ -43,6 +44,7 @@ function connectToServer(connectToServerCallback) {
 		connectToServerCallback(null, "connected");
 	});
 
+	// Upon receiving a ping from the Twitch server, log it
 	global.tmi_client.on("ping", function () {
     	var timeString = createTimeString();
 
@@ -51,6 +53,7 @@ function connectToServer(connectToServerCallback) {
 		}
 	});
 
+	// Upon sending a response to the Twitch server, log it
 	global.tmi_client.on("pong", function (latency) {
 		var timeString = createTimeString();
 
@@ -72,7 +75,7 @@ module.exports = {
 			], function(err) {
 			if(err) {
 				connectBotCallback(err, null);
-				console.error('Error during initial connections of AstroBot.', error);
+				console.error('Error during initial connections of AstroBot.', err);
 			} else {
 				connectBotCallback(null, "connected");
 
@@ -115,6 +118,7 @@ module.exports = {
 						if(err) {
 							console.error('Error during message checking.', err);
 						} else {
+							// DEBUG PRINT
 							if (global.runDebugPrints == true) {
 								console.log("Message checked.");
 							}
@@ -165,6 +169,7 @@ module.exports = {
 		global.tmi_client.on("subscription", function (channel, username, method, message, userstate) {
 			var timeString = createTimeString();
 
+			// DEBUG PRINT
 			if (global.runDebugPrints == true) {
 				console.log(`[${timeString}] ${username} subscribed on ${channel} with the message "${message}"`);
 			}
@@ -175,6 +180,7 @@ module.exports = {
 		global.tmi_client.on("resub", function (channel, username, months, message, userstate, methods) {
 			var timeString = createTimeString();
 
+			// DEBUG PRINT
 			if (global.runDebugPrints == true) {
 				console.log(`[${timeString}] ${username} resubbed for ${months} months on ${channel} with the message "${message}"`);
 			}
@@ -185,6 +191,7 @@ module.exports = {
 		global.tmi_client.on("cheer", function (channel, userstate, message) {
 			var timeString = createTimeString();
 
+			// DEBUG PRINT
 			if (global.runDebugPrints == true) {
 				console.log(`[${timeString}] ${userstate.username} cheered ${userstate.bits} on ${channel} with the message "${message}"`);
 			}

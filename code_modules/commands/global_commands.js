@@ -7,8 +7,6 @@
 const dbPool = require("../database/pool");
 const async = require("async");
 const botUtils = require("../bot_core/bot_utils.js");
-const commandParse = require("./command_parser");
-const responseParse = require("./response_parser");
 const commandUtils = require("./command_utils");
 
 module.exports = {

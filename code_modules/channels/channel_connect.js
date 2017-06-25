@@ -11,7 +11,7 @@ module.exports = {
 		dbPool.query(`SELECT * FROM public."channels"`, [], function (err, channelList) {
 			if(err){
 				console.error('Error running channel list query.', err);
-				readChannelsCallback(err, null);
+				readAllChannelsCallback(err, null);
 				return;
 			}
 
@@ -24,11 +24,11 @@ module.exports = {
 		});
 	},
 
-	readNewChannels(connectToServerResult, readChannelsCallback) {
+	readNewChannels(connectToServerResult, readNewChannelsCallback) {
 		dbPool.query(`SELECT * FROM public."channels WHERE "channel_connected" = 'false'`, [], function (err, channelList) {
 			if(err){
 				console.error('Error running channel list query.', err);
-				readChannelsCallback(err, null);
+				readNewChannelsCallback(err, null);
 				return;
 			}
 
@@ -37,7 +37,7 @@ module.exports = {
 				console.log("There are " + channelList.rows.length + " channels detected.");
 			}
 			
-			readNewChannels(null, channelList);
+			readNewChannelsCallback(null, channelList);
 		});
 	},
 
@@ -46,7 +46,7 @@ module.exports = {
 		for(var i = 0; i < channelList.rows.length; i++){
 			global.tmi_client.join(channelList.rows[i].channel_username);
 
-			dbPool.query(`UPDATE public."channels" SET "channel_connected" = 'true' WHERE "channel_username" = '${channelList.rows[i].channel_username}';`, [], function (err, channelList) {
+			dbPool.query(`UPDATE public."channels" SET "channel_connected" = 'true' WHERE "channel_username" = '${channelList.rows[i].channel_username}';`, [], function (err, channelConnect) {
 				if(err){
 					console.error('Error running channel connected update query.', err);
 					connectToAllChannelsCallBack(err, null);
@@ -63,7 +63,7 @@ module.exports = {
 		for(var i = 0; i < channelList.rows.length; i++){
 			global.tmi_client.join(channelList.rows[i].channel_username);
 
-			dbPool.query(`UPDATE public."channels" SET "channel_connected" = 'true' WHERE "channel_username" = '${channelList.rows[i].channel_username}';`, [], function (err, channelList) {
+			dbPool.query(`UPDATE public."channels" SET "channel_connected" = 'true' WHERE "channel_username" = '${channelList.rows[i].channel_username}';`, [], function (err, channelConnect) {
 				if(err){
 					console.error('Error running channel connected update query.', err);
 					connectToNewChannelsCallBack(err, null);
