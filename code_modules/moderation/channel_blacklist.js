@@ -4,13 +4,13 @@
 // Description: 
 //------------------------------------------------
 
-const dbPool = require("../database/pool");
-const modUtils = require("./moderation_utils");
+var dbPool = require("../database/pool");
+var modUtils = require("./moderation_utils");
 
 module.exports = {
 	runChannelBlacklist(channel, userstate, message, channelID, userID, userRoleID, hasExecuted, runChannelBlacklistCallback) {
 		// If there is some weird channel database error or something has previously executed, don't execute
-		if(channelID == -1 || hasExecuted == 1){
+		if(channelID === -1 || hasExecuted === 1){
 			runChannelBlacklistCallback(null, channel, userstate, message, channelID, userID, userRoleID, 1);
 			return;
 		} else {
@@ -22,7 +22,7 @@ module.exports = {
 					return;
 				} else if (channelBlacklist.rows.length === 0) {
 					// Debug print
-					if (global.runDebugPrints == true) {
+					if (global.runDebugPrints === true) {
 						console.log(`There are no blacklist items for ${channel.substr(1)}.`);
 					}
 
@@ -30,7 +30,7 @@ module.exports = {
 					return;
 				} else {
 					// Debug print
-					if (global.runDebugPrints == true) {
+					if (global.runDebugPrints === true) {
 						console.log(`There are " + channelBlacklist.rows.length + " blacklist items for ${channel.substr(1)}.`);
 					}
 
@@ -44,7 +44,7 @@ module.exports = {
 							runChannelBlacklistCallback(null, channel, userstate, message, channelID, userID, userRoleID, 1);
 							return;
 						// If not found and it is the last item, run the callback
-						} else if (message.search(channelBlacklist.rows[i].input) == -1 && i == 0) {
+						} else if (message.search(channelBlacklist.rows[i].input) === -1 && i === 0) {
 							runChannelBlacklistCallback(null, channel, userstate, message, channelID, userID, userRoleID, 0);
 							return;
 						}

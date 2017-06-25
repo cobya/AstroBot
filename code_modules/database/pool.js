@@ -1,6 +1,6 @@
 // Connects to the database using a pool of clients
 
-const pg = require('pg');
+var pg = require('pg');
 
 var db_config = {
 	user: '', //env var: PGUSER 
@@ -12,7 +12,7 @@ var db_config = {
 	idleTimeoutMillis: 30000, // how long a client is allowed to remain idle before being closed 
 };
 
-const pool = new pg.Pool(db_config);
+var pool = new pg.Pool(db_config);
 
 pool.on('error', function (err, client) {
 	// if an error is encountered by a client while it sits idle in the pool 

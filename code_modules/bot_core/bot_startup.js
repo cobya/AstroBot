@@ -5,28 +5,28 @@
 //------------------------------------------------
 
 // Including all of the necessary modules for the bot to run
-const CronJob = require("cron").CronJob;
-const async = require("async");
-const addZero = require("add-zero");
-const channelConnect = require("../channels/channel_connect");
-const botUtils = require("./bot_utils");
-const dbPool = require("../database/pool");
+var CronJob = require("cron").CronJob;
+var async = require("async");
+var addZero = require("add-zero");
+var channelConnect = require("../channels/channel_connect");
+var botUtils = require("./bot_utils");
+var dbPool = require("../database/pool");
 
 // Including the moderation code modules
-const globalBlacklist = require("../moderation/global_blacklist");
-const channelBlacklist = require("../moderation/channel_blacklist");
-const linkModeration = require("../moderation/manage_links");
-const copypastaModeration = require("../moderation/copypasta_spam");
-const emoteModeration = require("../moderation/emote_spam");
-const repeatedModeration = require("../moderation/repeated_words_spam");
-const capsModeration = require("../moderation/caps_spam");
-const symbolModeration = require("../moderation/symbol_spam");
+var globalBlacklist = require("../moderation/global_blacklist");
+var channelBlacklist = require("../moderation/channel_blacklist");
+var linkModeration = require("../moderation/manage_links");
+var copypastaModeration = require("../moderation/copypasta_spam");
+var emoteModeration = require("../moderation/emote_spam");
+var repeatedModeration = require("../moderation/repeated_words_spam");
+var capsModeration = require("../moderation/caps_spam");
+var symbolModeration = require("../moderation/symbol_spam");
 
 // Including the commands and alert modules
-const globalCommands = require("../commands/global_commands");
-const channelCommands = require("../commands/channel_commands");
-const subAlerts = require("../alerts/sub_alert");
-const bitAlerts = require("../alerts/bits_alert");
+var globalCommands = require("../commands/global_commands");
+var channelCommands = require("../commands/channel_commands");
+var subAlerts = require("../alerts/sub_alert");
+var bitAlerts = require("../alerts/bits_alert");
 
 // Creates a time string with the format HH:MM:SS
 function createTimeString() {
@@ -48,7 +48,7 @@ function connectToServer(connectToServerCallback) {
 	global.tmi_client.on("ping", function () {
     	var timeString = createTimeString();
 
-		if (global.runConnectionPrints == true) {
+		if (global.runConnectionPrints === true) {
 			console.log(`[${timeString}] Received PING from Twitch servers`);
 		}
 	});
@@ -57,7 +57,7 @@ function connectToServer(connectToServerCallback) {
 	global.tmi_client.on("pong", function (latency) {
 		var timeString = createTimeString();
 
-		if (global.runConnectionPrints == true) {
+		if (global.runConnectionPrints === true) {
 			console.log(`[${timeString}] Sent a PONG to Twitch servers with a latency of ${latency}s`);
 		}
 		
@@ -72,6 +72,7 @@ module.exports = {
 			connectToServer, 
 			channelConnect.readAllChannels, 
 			channelConnect.connectToAllChannels,
+			botUtils.setCooldownsFalse
 			], function(err) {
 			if(err) {
 				connectBotCallback(err, null);
@@ -79,7 +80,7 @@ module.exports = {
 			} else {
 				connectBotCallback(null, "connected");
 
-				if (global.runDebugPrints == true) {
+				if (global.runDebugPrints === true) {
 					console.log("Successful initial connections.");
 				}
 				
@@ -119,7 +120,7 @@ module.exports = {
 							console.error('Error during message checking.', err);
 						} else {
 							// DEBUG PRINT
-							if (global.runDebugPrints == true) {
+							if (global.runDebugPrints === true) {
 								console.log("Message checked.");
 							}
 						}
@@ -152,7 +153,7 @@ module.exports = {
 						if(err) {
 							console.error('Error during message checking.', err);
 						} else {
-							if (global.runDebugPrints == true) {
+							if (global.runDebugPrints === true) {
 								console.log("Message checked.");
 							}
 						}
@@ -170,7 +171,7 @@ module.exports = {
 			var timeString = createTimeString();
 
 			// DEBUG PRINT
-			if (global.runDebugPrints == true) {
+			if (global.runDebugPrints === true) {
 				console.log(`[${timeString}] ${username} subscribed on ${channel} with the message "${message}"`);
 			}
 			
@@ -181,7 +182,7 @@ module.exports = {
 			var timeString = createTimeString();
 
 			// DEBUG PRINT
-			if (global.runDebugPrints == true) {
+			if (global.runDebugPrints === true) {
 				console.log(`[${timeString}] ${username} resubbed for ${months} months on ${channel} with the message "${message}"`);
 			}
 			
@@ -192,7 +193,7 @@ module.exports = {
 			var timeString = createTimeString();
 
 			// DEBUG PRINT
-			if (global.runDebugPrints == true) {
+			if (global.runDebugPrints === true) {
 				console.log(`[${timeString}] ${userstate.username} cheered ${userstate.bits} on ${channel} with the message "${message}"`);
 			}
 

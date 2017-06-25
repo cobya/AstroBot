@@ -7,7 +7,7 @@
 module.exports = {
 	manageLinks(channel, userstate, message, channelID, userID, userRoleID, hasExecuted, manageLinksCallback) {
 		// If there is some weird channel database error or something has previously executed, don't execute
-		if(channelID == -1 || hasExecuted == 1){
+		if(channelID === -1 || hasExecuted === 1){
 			manageLinksCallback(null, channel, userstate, message, channelID, userID, userRoleID, 1);
 			return;
 		} else {

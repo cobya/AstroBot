@@ -5,10 +5,10 @@
 //------------------------------------------------
 
 // Requiring all of the necessary modules for this bot to run.
-const tmi = require("tmi.js");
-const async = require("async");
-const botStartup = require("./code_modules/bot_core/bot_startup");
-const botCleanup = require("./code_modules/bot_core/bot_cleanup").Cleanup();
+var tmi = require("tmi.js");
+var async = require("async");
+var botStartup = require("./code_modules/bot_core/bot_startup");
+var botCleanup = require("./code_modules/bot_core/bot_cleanup").Cleanup();
 
 // Creating a global EOL variable
 global.endOfLine = require('os').EOL;

@@ -4,16 +4,24 @@
 // Description: Sets up CRON Jobs, continuous chat reading, and checks to webserver to initialize new things
 //------------------------------------------------
 
-const dbPool = require("../database/pool");
+var async = require("async");
+var dbPool = require("../database/pool");
+var channelConnect = require("../channels/channel_connect");
 
 function exitFunctionality() {
+	if (process.exitTimeoutId){
+        return;
+    }
+
+    process.exitTimeoutId = setTimeout(process.exit, 5000);
+
 	dbPool.query(`UPDATE public."channels" SET "channel_connected" = 'false'`, [], function (err, commandInfo) {
 		if(err){
 			console.error(`We're all fucked now`, err);
 			return;
 		} else {
-			if (global.runDebugPrints == true) {
-				console.log(`All channels have had their connected value set to false`);
+			if (global.runDebugPrints === true) {
+				console.log(`All channels have had their connected value set to false.`);
 			}
 			return;
 		}

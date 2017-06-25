@@ -7,7 +7,7 @@
 module.exports = {
 	symbolModeration(channel, userstate, message, channelID, userID, userRoleID, hasExecuted, symbolModerationCallback) {
 		// If there is some weird channel database error or something has previously executed, don't execute
-		if(channelID == -1 || hasExecuted == 1){
+		if(channelID === -1 || hasExecuted === 1){
 			symbolModerationCallback(null, channel, userstate, message, channelID, userID, userRoleID, 1);
 			return;
 		} else {

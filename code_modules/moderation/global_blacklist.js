@@ -4,13 +4,13 @@
 // Description: Contains the functionality to implement a global blacklist and moderate messages against it
 //------------------------------------------------
 
-const dbPool = require("../database/pool");
-const modUtils = require("./moderation_utils");
+var dbPool = require("../database/pool");
+var modUtils = require("./moderation_utils");
 
 module.exports = {
 	runGlobalBlacklist(channel, userstate, message, channelID, userID, userRoleID, runGlobalBlacklistCallback) {
 		// If there is some weird channel database error, don't execute
-		if(channelID == -1){
+		if(channelID === -1){
 			runGlobalBlacklistCallback(null, channel, userstate, message, channelID, userID, userRoleID, 1);
 			return;
 		} else {
@@ -21,7 +21,7 @@ module.exports = {
 					return;
 				} else if (globalBlacklist.rows.length === 0) {
 					// Debug print
-					if (global.runDebugPrints == true) {
+					if (global.runDebugPrints === true) {
 						console.log("There are no global blacklist items.");
 					}
 
@@ -29,7 +29,7 @@ module.exports = {
 					return;
 				} else {
 					// Debug print
-					if (global.runDebugPrints == true) {
+					if (global.runDebugPrints === true) {
 						console.log("There are " + globalBlacklist.rows.length + " global blacklist items.");
 					}
 
@@ -42,7 +42,7 @@ module.exports = {
 							runGlobalBlacklistCallback(null, channel, userstate, message, channelID, userID, userRoleID, 1);
 							return;
 						// If not found and it is the last item, run the callback
-						} else if (message.search(globalBlacklist.rows[i].input) == -1 && i == 0) {
+						} else if (message.search(globalBlacklist.rows[i].input) === -1 && i === 0) {
 							runGlobalBlacklistCallback(null, channel, userstate, message, channelID, userID, userRoleID, 0);
 							return;
 						}

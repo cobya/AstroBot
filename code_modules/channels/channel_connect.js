@@ -4,7 +4,7 @@
 // Description: Contains the functions necessary to connect to channels at startup and during operation
 //------------------------------------------------
 
-const dbPool = require("../database/pool");
+var dbPool = require("../database/pool");
 
 module.exports = {
 	readAllChannels(connectToServerResult, readAllChannelsCallback) {
@@ -16,7 +16,7 @@ module.exports = {
 			}
 
 			// Debug print
-			if (global.runDebugPrints == true) {
+			if (global.runDebugPrints === true) {
 				console.log("There are " + channelList.rows.length + " channels detected.");
 			}
 
@@ -33,7 +33,7 @@ module.exports = {
 			}
 
 			// Debug print
-			if (global.runDebugPrints == true) {
+			if (global.runDebugPrints === true) {
 				console.log("There are " + channelList.rows.length + " channels detected.");
 			}
 			
@@ -55,7 +55,7 @@ module.exports = {
 			});
 		}
 
-		connectToAllChannelsCallBack(null, "connected to all channels");
+		connectToAllChannelsCallBack(null, channelList);
 	},
 
 	// Connecting to only channels which are not already connected

@@ -4,8 +4,8 @@
 // Description: Contains various utility functions used across the bot's different features
 //------------------------------------------------
 
-const dbPool = require("../database/pool");
-const async = require("async");
+var dbPool = require("../database/pool");
+var async = require("async");
 
 module.exports = {
 	getChannelID(channel, userstate, message, getChannelIDCallback) {
@@ -17,7 +17,7 @@ module.exports = {
 				return;
 			} else if (channelID.rows.length !== 0) {
 				// DEBUG PRINT
-				if (global.runDebugPrints == true) {
+				if (global.runDebugPrints === true) {
 					console.log(`Channel ID is ${channelID.rows[0].channel_id}`);
 				}
 
@@ -32,7 +32,7 @@ module.exports = {
 	},
 
 	getUserID(channel, userstate, message, channelID, getUserIDCallback) {
-		if(channelID == -1){
+		if(channelID === -1){
 			getUserIDCallback(null, channel, userstate, message, -1, -1);
 			return;
 		} else {
@@ -44,7 +44,7 @@ module.exports = {
 					return;
 				} else if (userID.rows.length !== 0) {
 					// DEBUG PRINT
-					if (global.runDebugPrints == true) {
+					if (global.runDebugPrints === true) {
 						console.log(`User ID is ${userID.rows[0].user_id}`);
 					}
 
@@ -52,13 +52,13 @@ module.exports = {
 					return;
 				} else if (userID.rows.length === 0) {
 					// DEBUG PRINT
-					if (global.runDebugPrints == true) {
+					if (global.runDebugPrints === true) {
 						console.log(`User ID not found for ${user}.`);
 					}
 					
 
 					// If user is special (Moderator) and does not have a userid, create but return -1 for userID, else return -1 for userID
-					if(userstate.mod == true) {
+					if(userstate.mod === true) {
 						// Create and insert into db here - TO DO
 						getUserIDCallback(null, channel, userstate, message, channelID, -1);
 						return;
@@ -74,14 +74,14 @@ module.exports = {
 
 	// Returns the role of a user within a specified channel
 	getUserRoleID(channel, userstate, message, channelID, userID, getUserRoleIDCallback) {
-		if(channelID == -1) { // If the channel doesn't exist, exits
+		if(channelID === -1) { // If the channel doesn't exist, exits
 			getUserRoleIDCallback(null, channel, userstate, message, -1, -1, -1);
 			return;
-		} else if (userID == -1) { // If the user doesn't exist, run a check of userstate to determine role
-			if (userstate.mod == true) { // If mod, return a userrole of 5
+		} else if (userID === -1) { // If the user doesn't exist, run a check of userstate to determine role
+			if (userstate.mod === true) { // If mod, return a userrole of 5
 				getUserRoleIDCallback(null, channel, userstate, message, channelID, userID, 5);
 				return;
-			} else if (userstate.subscriber == true) { // If sub, return a userrole of 7
+			} else if (userstate.subscriber === true) { // If sub, return a userrole of 7
 				getUserRoleIDCallback(null, channel, userstate, message, channelID, userID, 7);
 				return;
 			} else { // Else assume regular viewer, return 8
@@ -96,7 +96,7 @@ module.exports = {
 					return;
 				} else if (userRoleID.rows.length !== 0) { // If there is a role for the user, return that
 					// DEBUG PRINT
-					if (global.runDebugPrints == true) {
+					if (global.runDebugPrints === true) {
 						console.log(`User ID ${userID} has Role ID ${userRoleID.rows[0].role_id}`);
 					}
 					
@@ -105,14 +105,14 @@ module.exports = {
 					return;
 				} else if (userRoleID.rows.length === 0) { // If there is not a role for the user, determine one
 					// DEBUG PRINT
-					if (global.runDebugPrints == true) {
+					if (global.runDebugPrints === true) {
 						console.log(`User ID ${userID} does not have a role in Channel ID ${channelID}`);
 					}
 					
-					if (userstate.mod == true) { // If mod, return a userrole of 5
+					if (userstate.mod === true) { // If mod, return a userrole of 5
 						getUserRoleIDCallback(null, channel, userstate, message, channelID, userID, 5);
 						return;
-					} else if (userstate.subscriber == true) { // If sub, return a userrole of 7
+					} else if (userstate.subscriber === true) { // If sub, return a userrole of 7
 						getUserRoleIDCallback(null, channel, userstate, message, channelID, userID, 7);
 						return;
 					} else { // Else assume regular viewer, return 8
@@ -134,6 +134,33 @@ module.exports = {
 
 	removeChannel(channelName, channelID) {
 
+	},
+
+	setCooldownsFalse(channelList, setCooldownsFalseCallback) {
+		if (channelList.rows.length === 0) {
+			setCooldownsFalseCallback(null, "channels connected");
+			return;
+		} else {
+			for(var i = 0; i < channelList.rows.length; i++){
+				var channelCommandQuery = `UPDATE public."${channelList.rows[i].channel_id}_commands" SET "command_on_cooldown" = 'false';`;
+				dbPool.query(channelCommandQuery, [], function (err, channelCommandCooldown) {
+					if(err){
+						console.error('Error running channel connected update query.', err);
+						return;
+					}
+				});
+
+				var channelGlobalCommandQuery = `UPDATE public."${channelList.rows[i].channel_id}_global_commands_settings" SET "command_on_cooldown" = 'false';`;
+				dbPool.query(channelGlobalCommandQuery, [], function (err, channelGlobalCommandCooldown) {
+					if(err){
+						console.error('Error running channel connected update query.', err);
+						return;
+					}
+				});
+			}
+			setCooldownsFalseCallback(null, "channels connected");
+			return;
+		}		
 	}
 
 };
