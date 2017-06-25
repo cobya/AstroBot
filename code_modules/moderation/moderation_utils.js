@@ -4,10 +4,6 @@
 // Description: Contains all the utilities needed to execute channel moderation
 //------------------------------------------------
 
-function checkIfModerator(channel) {
-
-}
-
 module.exports = {
 	modAction(channel, userstate, action, customMessage) {
 		// If the action === -1, ban the user
@@ -37,6 +33,7 @@ module.exports = {
 			}
 
 			global.tmi_client.timeout(channel, userstate.username, action, customMessage);
+
 			global.tmi_client.on("notice", function (noticeChannel, noticeMsgID, noticeMessage) {
 				if (noticeMsgID.search("no_permission") != -1 && noticeChannel === channel) {
 					global.tmi_client.whisper(channel.substr(1), `Hello! I am running in your channel but I have not been given moderator permissions. 

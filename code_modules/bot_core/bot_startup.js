@@ -5,7 +5,7 @@
 //------------------------------------------------
 
 // Including all of the necessary modules for the bot to run
-var CronJob = require("cron").CronJob;
+var cron = require("node-cron");
 var async = require("async");
 var addZero = require("add-zero");
 var channelConnect = require("../channels/channel_connect");
@@ -46,7 +46,7 @@ function connectToServer(connectToServerCallback) {
 
 	// Upon receiving a ping from the Twitch server, log it
 	global.tmi_client.on("ping", function () {
-    	var timeString = createTimeString();
+		var timeString = createTimeString();
 
 		if (global.runConnectionPrints === true) {
 			console.log(`[${timeString}] Received PING from Twitch servers`);

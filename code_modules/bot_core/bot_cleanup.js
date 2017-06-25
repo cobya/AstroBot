@@ -9,12 +9,6 @@ var dbPool = require("../database/pool");
 var channelConnect = require("../channels/channel_connect");
 
 function exitFunctionality() {
-	if (process.exitTimeoutId){
-        return;
-    }
-
-    process.exitTimeoutId = setTimeout(process.exit, 5000);
-
 	dbPool.query(`UPDATE public."channels" SET "channel_connected" = 'false'`, [], function (err, commandInfo) {
 		if(err){
 			console.error(`We're all fucked now`, err);
@@ -44,9 +38,9 @@ exports.Cleanup = function Cleanup(callback) {
 	process.on('SIGINT', function () {
 		console.log('PROCESS EXIT: Ctrl-C Interrupt');
 		process.exit(2);
- 	});
+	});
 
- 	//catch uncaught exceptions, trace, then exit normally
+	//catch uncaught exceptions, trace, then exit normally
 	process.on('uncaughtException', function(e) {
 		console.log('PROCESS EXIT: Uncaught Exception');
 		console.log(e.stack);

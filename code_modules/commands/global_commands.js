@@ -55,7 +55,7 @@ module.exports = {
 							commandUtils.setGlobalCommandCooldown(channelID, commandInfo.rows[0].command_id, true); // Set the command to be on cooldown
 							setTimeout(function() { // Call a timer to set the command to be off cooldown after its specified time
 									commandUtils.setGlobalCommandCooldown(channelID, commandInfo.rows[0].command_id, false);
-								}, commandInfo.rows[0].command_cooldown * 1000);
+								}, channelGlobalCommandSettings.rows[0].command_cooldown * 1000);
 
 							checkGlobalCommandCallback(null, channel, userstate, message, channelID, userID, userRoleID, 1);
 							return;
@@ -67,7 +67,5 @@ module.exports = {
 				}
 			});
 		}
-
-		
 	}
 };
