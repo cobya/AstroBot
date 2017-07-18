@@ -5,14 +5,14 @@
 //------------------------------------------------
 
 module.exports = {
-	symbolModeration(channel, userstate, message, channelID, userID, userRoleID, hasExecuted, symbolModerationCallback) {
+	symbolModeration(channel, userstate, message, channelID, userID, userRoleID, channelSettings, hasExecuted, symbolModerationCallback) {
 		// If there is some weird channel database error or something has previously executed, don't execute
 		if(channelID === -1 || hasExecuted === 1){
-			symbolModerationCallback(null, channel, userstate, message, channelID, userID, userRoleID, 1);
+			symbolModerationCallback(null, channel, userstate, message, channelID, userID, userRoleID, channelSettings, 1);
 			return;
 		} else {
 			// Just returns shit for now
-			symbolModerationCallback(null, channel, userstate, message, channelID, userID, userRoleID, 0);
+			symbolModerationCallback(null, channel, userstate, message, channelID, userID, userRoleID, channelSettings, 0);
 			return;
 		}
 	}

@@ -10,7 +10,6 @@ var async = require("async");
 var addZero = require("add-zero");
 var channelConnect = require("../channels/channel_connect");
 var botUtils = require("./bot_utils");
-var dbPool = require("../database/pool");
 
 // Including the moderation code modules
 var globalBlacklist = require("../moderation/global_blacklist");
@@ -49,16 +48,16 @@ function connectToServer(connectToServerCallback) {
 		var timeString = createTimeString();
 
 		if (global.runConnectionPrints === true) {
-			console.log(`[${timeString}] Received PING from Twitch servers`);
+			console.log(`[${timeString}] Received PING from Twitch servers.`);
 		}
 	});
 
-	// Upon sending a response to the Twitch server, log it
+	// Upon getting a response to the Twitch server, log it
 	global.tmi_client.on("pong", function (latency) {
 		var timeString = createTimeString();
 
 		if (global.runConnectionPrints === true) {
-			console.log(`[${timeString}] Sent a PONG to Twitch servers with a latency of ${latency}s`);
+			console.log(`[${timeString}] Pinged Twitch servers. PONG received with a latency of ${latency}s.`);
 		}
 		
 	});
@@ -78,12 +77,11 @@ module.exports = {
 				connectBotCallback(err, null);
 				console.error('Error during initial connections of AstroBot.', err);
 			} else {
-				connectBotCallback(null, "connected");
-
 				if (global.runDebugPrints === true) {
 					console.log("Successful initial connections.");
 				}
-				
+
+				connectBotCallback(null, "connected");
 			}
 		});
 	},
@@ -105,6 +103,7 @@ module.exports = {
 						async.apply(botUtils.getChannelID, channel, userstate, message),
 						botUtils.getUserID,
 						botUtils.getUserRoleID,
+						botUtils.getChannelSettings,
 						globalBlacklist.runGlobalBlacklist,
 						channelBlacklist.runChannelBlacklist,
 						linkModeration.manageLinks,
@@ -139,6 +138,7 @@ module.exports = {
 						async.apply(botUtils.getChannelID, channel, userstate, message),
 						botUtils.getUserID,
 						botUtils.getUserRoleID,
+						botUtils.getChannelSettings,
 						globalBlacklist.runGlobalBlacklist,
 						channelBlacklist.runChannelBlacklist,
 						linkModeration.manageLinks,

@@ -2,17 +2,7 @@
 
 var pg = require('pg');
 
-var db_config = {
-	user: '', //env var: PGUSER 
-	database: '', //env var: PGDATABASE 
-	password: '', //env var: PGPASSWORD 
-	host: '', // Server hosting the postgres database 
-	port: 5432, //env var: PGPORT 
-	max: 10, // max number of clients in the pool 
-	idleTimeoutMillis: 30000, // how long a client is allowed to remain idle before being closed 
-};
-
-var pool = new pg.Pool(db_config);
+var pool = new pg.Pool(global.dbConfig);
 
 pool.on('error', function (err, client) {
 	// if an error is encountered by a client while it sits idle in the pool 

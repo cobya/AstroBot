@@ -7,6 +7,7 @@
 var dbPool = require("../database/pool");
 
 module.exports = {
+	// Reads all of the channels within the database
 	readAllChannels(connectToServerResult, readAllChannelsCallback) {
 		dbPool.query(`SELECT * FROM public."channels"`, [], function (err, channelList) {
 			if(err){
@@ -24,8 +25,9 @@ module.exports = {
 		});
 	},
 
+	// Reads any unconnected channels from the database
 	readNewChannels(connectToServerResult, readNewChannelsCallback) {
-		dbPool.query(`SELECT * FROM public."channels WHERE "channel_connected" = 'false'`, [], function (err, channelList) {
+		dbPool.query(`SELECT * FROM public."channels" WHERE "channelConnected" = false`, [], function (err, channelList) {
 			if(err){
 				console.error('Error running channel list query.', err);
 				readNewChannelsCallback(err, null);
@@ -38,15 +40,16 @@ module.exports = {
 			}
 			
 			readNewChannelsCallback(null, channelList);
+			return;
 		});
 	},
 
-	// Connecting to every channel in the list, even if is "channel_connected" since the bot may have crashed
+	// Connecting to every channel in the list, even if is channelConnected since the bot may have crashed
 	connectToAllChannels(channelList, connectToAllChannelsCallBack) {
 		for(var i = 0; i < channelList.rows.length; i++){
-			global.tmi_client.join(channelList.rows[i].channel_username);
+			global.tmi_client.join(channelList.rows[i].channelName);
 
-			dbPool.query(`UPDATE public."channels" SET "channel_connected" = 'true' WHERE "channel_username" = '${channelList.rows[i].channel_username}';`, [], function (err, channelConnect) {
+			dbPool.query(`UPDATE public."channels" SET "channelConnected" = true WHERE "channelName" = '${channelList.rows[i].channelName}';`, [], function (err, channelConnect) {
 				if(err){
 					console.error('Error running channel connected update query.', err);
 					connectToAllChannelsCallBack(err, null);
@@ -61,9 +64,9 @@ module.exports = {
 	// Connecting to only channels which are not already connected
 	connectToNewChannels(channelList, connectToNewChannelsCallBack) {
 		for(var i = 0; i < channelList.rows.length; i++){
-			global.tmi_client.join(channelList.rows[i].channel_username);
+			global.tmi_client.join(channelList.rows[i].channelName);
 
-			dbPool.query(`UPDATE public."channels" SET "channel_connected" = 'true' WHERE "channel_username" = '${channelList.rows[i].channel_username}';`, [], function (err, channelConnect) {
+			dbPool.query(`UPDATE public."channels" SET "channelConnected" = true WHERE "channelName" = '${channelList.rows[i].channelName}';`, [], function (err, channelConnect) {
 				if(err){
 					console.error('Error running channel connected update query.', err);
 					connectToNewChannelsCallBack(err, null);

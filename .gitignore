@@ -2,6 +2,14 @@
 *.sublime-project
 *.sublime-workspace
 
+# Credentials
+AstroBot_credentials.js
+sftp-config.json
+
+# Secondary Bot Configs
+TamamoCat_init.js
+TamamoCat_credentials.js
+
 # My Notes
 DataBaseStructure.xlsx
 DBStructure.png
@@ -11,3 +19,4 @@ ToDo.txt
 BeforeCommit.txt
 InsertData.txt
 WaterfallStructure.txt
+PSQLNotes.txt

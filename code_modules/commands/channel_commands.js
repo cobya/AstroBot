@@ -10,11 +10,14 @@ var botUtils = require("../bot_core/bot_utils.js");
 var commandUtils = require("./command_utils");
 
 module.exports = {
-	checkChannelCommand(channel, userstate, message, channelID, userID, userRoleID, hasExecuted, checkChannelCommandCallback) {
+	// Checks a message to see if a channel command was called
+	checkChannelCommand(channel, userstate, message, channelID, userID, userRoleID, channelSettings, hasExecuted, checkChannelCommandCallback) {
+		// If there is a weird error, just don't try
 		if(channelID === -1 || message.charAt(0) != "!" || hasExecuted === 1) {
-			checkChannelCommandCallback(null, channel, userstate, message, channelID, userID, userRoleID, 1);
+			checkChannelCommandCallback(null, channel, userstate, message, channelID, userID, userRoleID, channelSettings, 1);
 			return;
 		} else {
+			// Return the command only
 			if(message.indexOf(' ') >= 0) {
 				var commandOnlyString = message.substr(0, message.indexOf(' '));
 				var afterCommandString = message.substr(message.indexOf(' ') + 1);
@@ -25,11 +28,11 @@ module.exports = {
 			}
 			
 			// Queries the database to see if the commandOnlyString matches a valid channel command
-			dbPool.query(`SELECT * FROM public."${channelID}_commands" WHERE "command" = $1`, [commandOnlyString], function (err, commandInfo) {
+			dbPool.query(`SELECT * FROM public."channelCommands" WHERE "commandText" = $1 AND "channelUserID" = ${channelID}`, [commandOnlyString], function (err, commandInfo) {
 				// If error, exit
 				if (err) {
 					console.error('Error running channel command query.', err);
-					checkChannelCommandCallback(err, channel, userstate, message, channelID, userID, userRoleID, 0);
+					checkChannelCommandCallback(err, channel, userstate, message, channelID, userID, userRoleID, channelSettings, 0);
 					return;
 				// Else if no commands, return
 				} else if (commandInfo.rows.length === 0) {
@@ -38,28 +41,28 @@ module.exports = {
 						console.log('No matching channel command.');
 					}
 					
-					checkChannelCommandCallback(null, channel, userstate, message, channelID, userID, userRoleID, 0);
+					checkChannelCommandCallback(null, channel, userstate, message, channelID, userID, userRoleID, channelSettings, 0);
 					return;
 				// If command found, run it and return
 				} else {
 					// DEBUG PRINT
 					if (global.runDebugPrints === true) {
-						console.log(`Matching channel command with ID ${commandInfo.rows[0].command_id}.`);
+						console.log(`Matching channel command with ID ${commandInfo.rows[0].commandID}.`);
 					}
 					
 					// Check to make sure the user can run the command and run it, else say executed and return
-					if (commandInfo.rows[0].command_enabled === true && commandInfo.rows[0].command_on_cooldown === false && commandInfo.rows[0].command_required_role_id >= userRoleID) {
+					if (commandInfo.rows[0].commandEnabled === true && commandInfo.rows[0].commandOnCooldown === false && commandInfo.rows[0].commandRequiredRoleID <= userRoleID) {
 
 						commandUtils.runCommand(channel, userstate, message, commandInfo, userRoleID); // Run the command
-						commandUtils.setChannelCommandCooldown(channelID, commandInfo.rows[0].command_id, true); // Set the command to be on cooldown
+						commandUtils.setChannelCommandCooldown(channelID, commandInfo.rows[0].commandID, true); // Set the command to be on cooldown
 						setTimeout(function() { // Call a timer to set the command to be off cooldown after its specified time
-								commandUtils.setChannelCommandCooldown(channelID, commandInfo.rows[0].command_id, false);
-							}, commandInfo.rows[0].command_cooldown * 1000);
+							commandUtils.setChannelCommandCooldown(channelID, commandInfo.rows[0].commandID, false);
+						}, commandInfo.rows[0].commandCooldown * 1000);
 
-						checkChannelCommandCallback(null, channel, userstate, message, channelID, userID, userRoleID, 1);
+						checkChannelCommandCallback(null, channel, userstate, message, channelID, userID, userRoleID, channelSettings, 1);
 						return;
 					} else {
-						checkChannelCommandCallback(null, channel, userstate, message, channelID, userID, userRoleID, 1);
+						checkChannelCommandCallback(null, channel, userstate, message, channelID, userID, userRoleID, channelSettings, 1);
 						return;
 					}
 					

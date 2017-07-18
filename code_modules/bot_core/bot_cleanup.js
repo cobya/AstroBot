@@ -8,8 +8,9 @@ var async = require("async");
 var dbPool = require("../database/pool");
 var channelConnect = require("../channels/channel_connect");
 
+// Defines the bot's functions needed to run on bot exit
 function exitFunctionality() {
-	dbPool.query(`UPDATE public."channels" SET "channel_connected" = 'false'`, [], function (err, commandInfo) {
+	dbPool.query(`UPDATE public."channels" SET "channelConnected" = false`, [], function (err, commandInfo) {
 		if(err){
 			console.error(`We're all fucked now`, err);
 			return;
