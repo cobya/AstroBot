@@ -55,8 +55,8 @@ module.exports = {
 						// If the user can run the command, run it
 						} else if (channelGlobalCommandSettings.rows[0].commandEnabled === true && channelGlobalCommandSettings.rows[0].commandOnCooldown === false && channelGlobalCommandSettings.rows[0].commandRequiredRoleID <= userRoleID) {
 							commandUtils.runCommand(channel, userstate, message, commandInfo, userRoleID); // Run the command
-							commandUtils.setGlobalCommandCooldown(channelID, commandInfo.rows[0].commandID, true); // Set the command to be on cooldown
 
+							commandUtils.setGlobalCommandCooldown(channelID, commandInfo.rows[0].commandID, true); // Set the command to be on cooldown
 							setTimeout(function() { // Call a timer to set the command to be off cooldown after its specified time
 								commandUtils.setGlobalCommandCooldown(channelID, commandInfo.rows[0].commandID, false);
 							}, channelGlobalCommandSettings.rows[0].commandCooldown * 1000);

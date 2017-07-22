@@ -19,6 +19,7 @@
   "dependencies": {
     "add-zero": "^1.0.0",
     "async": "^2.5.0",
+    "http": "0.0.0",
     "lodash": "^4.17.4",
     "node-cron": "^1.2.0",
     "os": "^0.1.1",

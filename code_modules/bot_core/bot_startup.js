@@ -100,8 +100,7 @@ module.exports = {
 				case "action":
 				case "chat":
 					async.waterfall([
-						async.apply(botUtils.getChannelID, channel, userstate, message),
-						botUtils.getUserID,
+						async.apply(botUtils.getMessageIDs, channel, userstate, message),
 						botUtils.getUserRoleID,
 						botUtils.getChannelSettings,
 						globalBlacklist.runGlobalBlacklist,
@@ -135,8 +134,7 @@ module.exports = {
 				default:
 					// do the same as chat? shouldn't happen, but still
 					async.waterfall([
-						async.apply(botUtils.getChannelID, channel, userstate, message),
-						botUtils.getUserID,
+						async.apply(botUtils.getMessageIDs, channel, userstate, message),
 						botUtils.getUserRoleID,
 						botUtils.getChannelSettings,
 						globalBlacklist.runGlobalBlacklist,

@@ -6,72 +6,132 @@
 
 var dbPool = require("../database/pool");
 var async = require("async");
+var https = require("https");
+var twitchClientID = require("../../AstroBot_credentials").twitchClientID;
 
-module.exports = {
-	// Gets the channel ID from a message
-	getChannelID(channel, userstate, message, getChannelIDCallback) {
-		var channelName = channel.substr(1);
-		dbPool.query(`SELECT "userID" FROM public."channels" WHERE "channelName" = $1`, [channelName], function(err, channelID) {
-			if(err){
-				console.error('Error running channel ID query.', err);
-				getChannelIDCallback(err, channel, userstate, message, -1);
-				return;
-			} else if (channelID.rows.length !== 0) {
-				// DEBUG PRINT
-				if (global.runDebugPrints === true) {
-					console.log(`Channel's user ID is ${channelID.rows[0].userID}`);
-				}
+// Gets the channel ID from a message
+function getChannelID(channel, userstate, message, getChannelIDCallback) {
+	var channelName = channel.substr(1);
+	dbPool.query(`SELECT "userID" FROM public."channels" WHERE "channelName" = $1`, [channelName], function(err, channelID) {
+		if(err) {
+			console.error('Error running channel ID query.', err);
+			getChannelIDCallback(err, -1);
+			return;
+		} else if (channelID.rows.length !== 0) {
+			// DEBUG PRINT
+			if (global.runDebugPrints === true) {
+				console.log(`Channel's user ID is ${channelID.rows[0].userID}`);
+			}
 
-				getChannelIDCallback(null, channel, userstate, message, channelID.rows[0].userID);
+			getChannelIDCallback(null, channelID.rows[0].userID);
+			return;
+		} else if (channelID.rows.length === 0) {
+			console.error(`Error. Channel's user ID not found for ${channelName}.`);
+			getChannelIDCallback(null, -1);
+			return;
+		}
+	});
+}
+
+// Gets the user ID from a message
+function getUserID(channel, userstate, message, getUserIDCallback) {
+	var user = userstate.username;
+	dbPool.query(`SELECT "userID" FROM public."users" WHERE "username" = $1`, [user], function(err, userID) {
+		if(err) {
+			console.error('Error running user ID query.', err);
+			getUserIDCallback(err, -1);
+			return;
+		} else if (userID.rows.length !== 0) {
+			// DEBUG PRINT
+			if (global.runDebugPrints === true) {
+				console.log(`User ID is ${userID.rows[0].userID}`);
+			}
+
+			getUserIDCallback(null, userID.rows[0].user_id);
+			return;
+		} else if (userID.rows.length === 0) {
+			// DEBUG PRINT
+			if (global.runDebugPrints === true) {
+				console.log(`User ID not found for ${user}.`);
+			}
+
+			// If user is special (Moderator) and does not have a userid, create but return -1 for userID, else return -1 for userID
+			if(userstate.mod === true) {
+				getUserIDCallback(null, -1);
 				return;
-			} else if (channelID.rows.length === 0) {
-				console.error(`Error. Channel's user ID not found for ${channelName}.`);
-				getChannelIDCallback(null, channel, userstate, message, -1);
+			} else { // If not special usertype, just return -1
+				getUserIDCallback(null, -1);
 				return;
 			}
-		});
-	},
-
-	// Gets the user ID from a message
-	getUserID(channel, userstate, message, channelID, getUserIDCallback) {
-		if(channelID === -1){
-			getUserIDCallback(null, channel, userstate, message, -1, -1);
-			return;
-		} else {
-			var user = userstate.username;
-			dbPool.query(`SELECT "userID" FROM public."users" WHERE "username" = $1`, [user], function(err, userID) {
-				if(err){
-					console.error('Error running user ID query.', err);
-					getUserIDCallback(err, channel, userstate, message, -1, -1);
-					return;
-				} else if (userID.rows.length !== 0) {
-					// DEBUG PRINT
-					if (global.runDebugPrints === true) {
-						console.log(`User ID is ${userID.rows[0].userID}`);
-					}
-
-					getUserIDCallback(null, channel, userstate, message, channelID, userID.rows[0].user_id);
-					return;
-				} else if (userID.rows.length === 0) {
-					// DEBUG PRINT
-					if (global.runDebugPrints === true) {
-						console.log(`User ID not found for ${user}.`);
-					}
 					
-
-					// If user is special (Moderator) and does not have a userid, create but return -1 for userID, else return -1 for userID
-					if(userstate.mod === true) {
-						// Create and insert into db here - TO DO
-						getUserIDCallback(null, channel, userstate, message, channelID, -1);
-						return;
-					} else { // If not special usertype, just return -1
-						getUserIDCallback(null, channel, userstate, message, channelID, -1);
-						return;
-					}
-					
-				}
-			});
 		}
+	});
+}
+
+// Pings the Twitch API to get a user's ID
+function getTwitchUserID(username, getTwitchUserIDCallback) {
+	var userID = -1;
+
+	// Sets the options for the API request
+	var userIDRequestOptions = {
+		host: `api.twitch.tv`,
+		path: `/kraken/users?login=${username}`,
+		headers: {
+			'Accept': 'application/vnd.twitchtv.v5+json',
+			'Client-ID': twitchClientID.clientID
+		}
+	};
+
+	// Sends the GET request to the Twitch Kraken API
+	var getUserIDResponse = https.get(userIDRequestOptions, function(response) {
+		// Get and parse the returned data
+		var bodyChunks = [];
+		response.on('data', function(chunk) {
+			bodyChunks.push(chunk);
+		}).on('end', function() {
+			var body = Buffer.concat(bodyChunks);
+			var responseBodyObj = JSON.parse(body);
+
+			// Grab the user ID and return it
+			userID = responseBodyObj.users[0]._id;
+			getTwitchUserIDCallback(null, username, userID);
+
+			if (global.runDebugPrints === true) {
+				console.log('Returned UserID: ' + userID);
+			}
+
+			return;
+		})
+	});
+		
+	// On an error from the request, log it
+	getUserIDResponse.on('error', function(err) {
+		console.log('User ID Fetch Error: ' + err.message);
+		getTwitchUserIDCallback(err, username, -1);
+		return;
+	});
+}
+
+module.exports = {
+	// Runs the ID grabbing queries in parallel for better response time
+	getMessageIDs(channel, userstate, message, getMessageIDsCallback) {
+		async.parallel([
+			function(getChannelIDCallback) {
+				getChannelID(channel, userstate, message, getChannelIDCallback);
+			},
+			function(getUserIDCallback) {
+				getUserID(channel, userstate, message, getUserIDCallback);
+			}
+			], function(err, messageIDs) {
+				if(err) {
+					getMessageIDsCallback(err, -1, -1);
+					return;
+				} else {
+					getMessageIDsCallback(null, channel, userstate, message, messageIDs[0], messageIDs[1]);
+					return;
+				}
+			}
+		);
 	},
 
 	// Returns the role of a user within a specified channel
@@ -101,7 +161,6 @@ module.exports = {
 					if (global.runDebugPrints === true) {
 						console.log(`User ID ${userID} has Role ID ${userRoleID.rows[0].roleID}`);
 					}
-					
 					
 					getUserRoleIDCallback(err, channel, userstate, message, channelID, userID, userRoleID.rows[0].roleID);
 					return;
@@ -134,22 +193,21 @@ module.exports = {
 		} else { // Else, query the DB and gets the channel's settings
 			var user = userstate.username;
 			dbPool.query(`SELECT * FROM public."channelSettings" WHERE "channelUserID" = ${channelID}`, [], function(err, channelSettings) {
-				if(err){ // If error running query, return the error
+				if(err) { // If error running query, return the error
 					getChannelSettingsCallback(err, channel, userstate, message, -1, -1, -1, -1);
 					return;
 				} else if (channelSettings.rows.length !== 0) { // If there is are channel settings, return that
 					// DEBUG PRINT
 					if (global.runDebugPrints === true) {
-						console.log(`Channel ID ${userID} has settings of ${channelSettings.rows[0]}`);
+						console.log(`Channel ID ${channelID} has settings of ${channelSettings.rows[0]}`);
 					}
 					
-					
-					getChannelSettingsCallback(err, channel, userstate, message, channelID, userID, userRoleID, channelSettings);
+					getChannelSettingsCallback(null, channel, userstate, message, channelID, userID, userRoleID, channelSettings);
 					return;
 				} else { // If there are no channel settings, send an error back
 					// DEBUG PRINT
 					if (global.runDebugPrints === true) {
-						console.log(`Channel ID ${userID} does not a have valid settings row.`);
+						console.log(`Channel ID ${channelID} does not a have valid settings row.`);
 					}
 					
 					getChannelSettingsCallback("There is not a valid channel settings row.", channel, userstate, message, channelID, userID, userRoleID, -1);
@@ -160,13 +218,25 @@ module.exports = {
 	},
 
 	// Creates a new user within the database
-	createUser(username, channelID, createUserCallback) {
-
+	addNewUser(username, userID, addNewUserCallback) {
+		dbPool.query(`INSERT INTO public."users"("userID", username) VALUES (${userID}, $1) ON CONFLICT ("userID") DO UPDATE SET "username" = $1`, [username], function(err, insertUserResult) {
+			if (err) {
+				addNewUserCallback(err, "Error inserting new user.");
+			} else {
+				addNewUserCallback(null, "Successfully created new user");
+			}
+		});
 	},
 
 	// Sets a user's role within the database
-	setUserRole(username, channelID, userRoleID){
-
+	setUserRole(userID, channelID, userRoleID, setUserRoleCallback){
+		dbPool.query(`INSERT INTO public."userChannelRoles"()("userID", "channelUserID", "roleID") VALUES (${userID}, ${channelID}, ${userRoleID}) ON CONFLICT ("userID", "channelUserID") DO UPDATE SET "roleID" = ${userRoleID}`, [], function(erro, setUserRoleResult) {
+			if(err){
+				setUserRoleCallback(err, "Error setting user role.");
+			} else {
+				setUserRoleCallback(null, "Successfully set user role.");
+			}
+		});
 	},
 
 	// Removes a channel from the database
@@ -201,5 +271,4 @@ module.exports = {
 			return;
 		}		
 	}
-
 };
