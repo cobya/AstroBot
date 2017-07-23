@@ -15,7 +15,7 @@ module.exports = {
 			runChannelBlacklistCallback(null, channel, userstate, message, channelID, userID, userRoleID, channelSettings, 1);
 			return;
 		} else {
-			dbPool.query(`SELECT * FROM public."channelBlacklist" WHERE "channelUserID" = $1`, [channelID], function (err, channelBlacklist) {
+			dbPool.query(`SELECT * FROM public."channelBlacklist" WHERE "channelUserID" = ${channelID}`, [], function (err, channelBlacklist) {
 				if(err){
 					console.error('Error running channel blacklist query.', err);
 					runChannelBlacklistCallback(err, channel, userstate, message, channelID, userID, userRoleID, channelSettings, 1);

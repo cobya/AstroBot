@@ -27,14 +27,6 @@ var channelCommands = require("../commands/channel_commands");
 var subAlerts = require("../alerts/sub_alert");
 var bitAlerts = require("../alerts/bits_alert");
 
-// Creates a time string with the format HH:MM:SS
-function createTimeString() {
-	var time = new Date();
-	var timeString = addZero(time.getHours()) + ":" + addZero(time.getMinutes()) + ":" + addZero(time.getSeconds());
-
-	return timeString;
-};
-
 // Connects to the Twitch IRC server and begins logging connection information
 function connectToServer(connectToServerCallback) {
 	global.tmi_client.connect();
@@ -45,7 +37,7 @@ function connectToServer(connectToServerCallback) {
 
 	// Upon receiving a ping from the Twitch server, log it
 	global.tmi_client.on("ping", function () {
-		var timeString = createTimeString();
+		var timeString = botUtils.createTimeString();
 
 		if (global.runConnectionPrints === true) {
 			console.log(`[${timeString}] Received PING from Twitch servers.`);
@@ -54,7 +46,7 @@ function connectToServer(connectToServerCallback) {
 
 	// Upon getting a response to the Twitch server, log it
 	global.tmi_client.on("pong", function (latency) {
-		var timeString = createTimeString();
+		var timeString = botUtils.createTimeString();
 
 		if (global.runConnectionPrints === true) {
 			console.log(`[${timeString}] Pinged Twitch servers. PONG received with a latency of ${latency}s.`);

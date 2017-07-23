@@ -1,3 +1,9 @@
+//------------------------------------------------
+// Name: bot_utils.js
+// Author: Coby Allred
+// Description: Contains various utility functions used across the bot's different features
+//------------------------------------------------
+
 module.exports = {
 	// Do a channel based chat alert after a new subsciption
 	bitAlert(channel, userstate) {

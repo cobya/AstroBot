@@ -6,7 +6,6 @@
 
 var async = require("async");
 var dbPool = require("../database/pool");
-var channelConnect = require("../channels/channel_connect");
 
 // Defines the bot's functions needed to run on bot exit
 function exitFunctionality() {
